@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css2?family=Galada&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <title>COVID-19 TESTER</title>
+    <link rel="stylesheet" href="index.css">
+  </head>
+  <body>
+      <div class="container">
+          <div class="row justify-content-center" id="input">
+          <input type="text" class="input" placeholder="State Or City">
+          </div>
+          <div id="container">
+
+          </div>
+          
+      </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <script>
+var coronadata=[];
+fetch("https://api.covid19india.org/state_district_wise.json")
+.then(function(res){
+    return res.json();
+})
+.then(function(data){
+    var states=Object.keys(data);
+    states.forEach(function(x){
+        var districts=Object.keys(data[x].districtData);
+        districts.forEach(function(a){
+            coronadata.push({
+                place:a,
+                cases:data[x].districtData[a].active
+            });
+
+        });
+    });            
+    var coronashrt=coronadata.slice(0,80);
+        putHtml(coronashrt);
+        document.querySelector("input").addEventListener("keyup",function(){
+        console.log(this.value);
+        var coronadatacpy=coronadata;
+        if(this.value==''){
+            document.querySelector("#container").innerHTML="";
+            putHtml(coronashrt);
+        }
+        else{
+        coronadatacpy=filterArray(coronadatacpy,this.value);
+        document.querySelector("#container").innerHTML="";
+        putHtml(coronadatacpy);}
+    });
+    
+});
+function putHtml(array){
+    num=0;
+    array.forEach(function(x){
+        if(num%2==0){
+            document.querySelector("#container").innerHTML+="<div class='row justify-content-center div'><div class='content'><div class='pr-4 pl-3 mt-3 mb-0'><div class='row justify-content-between'><h2 class='text-left pl-4'>"+x.place+"</h2><p class='text-right pr-4'>&#9;"+x.cases+"</p></div></div></div></div>";}
+            else{
+                document.querySelector("#container").innerHTML+="<div class='row justify-content-center div'><div class='content1'><div class='pr-4 pl-3 mt-3 mb-0'><div class='row justify-content-between'><h2 class='text-left pl-4'>"+x.place+"</h2><p class='text-right pr-4'>&#9;"+x.cases+"</p></div></div></div></div>";
+            }
+            num++;
+    });
+};
+function filterArray(array,str){
+    var regex= new RegExp(str,"gi");
+    var arr= array.filter(function(x){
+        if(x["place"].match(regex)){
+            return true;
+        }
+    });
+    return arr;
+}
+
+
+    </script>
+  </body>
+</html>
